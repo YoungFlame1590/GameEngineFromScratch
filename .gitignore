@@ -1,0 +1,15 @@
+# Visual Studio
+.vs/
+
+# Build outputs
+*.exe
+*.obj
+*.o
+*.out
+*.ilk
+*.pdb
+*.lib
+*.dll
+
+# Debug
+*.log
