@@ -1,6 +1,9 @@
 # Visual Studio
 .vs/
 
+# IDE
+.vscode/
+
 # CMake
 build/
 
