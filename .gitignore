@@ -1,6 +1,9 @@
 # Visual Studio
 .vs/
 
+# CMake
+build/
+
 # Build outputs
 *.exe
 *.obj
