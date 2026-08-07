@@ -17,5 +17,8 @@ build/
 *.lib
 *.dll
 
+# Linux build outputs
+/Platform/Linux/helloengine_xcb
+
 # Debug
 *.log
