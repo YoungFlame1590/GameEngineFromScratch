@@ -1,6 +1,6 @@
-#include <Windows.h>      // Win32 核心 API：窗口、消息、GDI 等
-#include <windowsx.h>     // 常用的窗口消息处理辅助宏（如 GET_X_LPARAM 等）
-#include <tchar.h>        // TCHAR 宏：支持 ANSI/Unicode 的通用字符类型映射
+#include <Windows.h>  // Win32 核心 API：窗口、消息、GDI 等
+#include <windowsx.h> // 常用的窗口消息处理辅助宏（如 GET_X_LPARAM 等）
+#include <tchar.h>    // TCHAR 宏：支持 ANSI/Unicode 的通用字符类型映射
 
 // 窗口过程（回调函数）前向声明，WinMain 中将其注册给窗口类
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -13,19 +13,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPTSTR lpCmdLine, int nCmdShow)
 {
-    HWND hWnd;        // 创建出的窗口句柄
-    WNDCLASSEX wc;    // 窗口类结构体，描述窗口的行为与外观
+    HWND hWnd;     // 创建出的窗口句柄
+    WNDCLASSEX wc; // 窗口类结构体，描述窗口的行为与外观
 
     // 将窗口类结构体全部清零，避免残留垃圾数据
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
-    wc.cbSize = sizeof(WNDCLASSEX);          // 结构体大小，供系统校验版本
-    wc.style = CS_HREDRAW | CS_VREDRAW;      // 窗口尺寸变化时（水平/垂直）自动重绘
-    wc.lpfnWndProc = WindowProc;             // 指定该窗口类的消息处理函数
-    wc.hInstance = hInstance;                // 关联当前程序实例
+    wc.cbSize = sizeof(WNDCLASSEX);           // 结构体大小，供系统校验版本
+    wc.style = CS_HREDRAW | CS_VREDRAW;       // 窗口尺寸变化时（水平/垂直）自动重绘
+    wc.lpfnWndProc = WindowProc;              // 指定该窗口类的消息处理函数
+    wc.hInstance = hInstance;                 // 关联当前程序实例
     wc.hCursor = LoadCursor(NULL, IDC_ARROW); // 使用系统默认箭头光标
     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;  // 窗口背景用系统窗口色（白色）
-    wc.lpszClassName = _T("WindowClass1");   // 窗口类名称，创建窗口时按名引用
+    wc.lpszClassName = _T("WindowClass1");    // 窗口类名称，创建窗口时按名引用
 
     // 向系统注册窗口类，之后才能用 CreateWindowEx 创建实例
     RegisterClassEx(&wc);
@@ -45,9 +45,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     // 消息循环：GetMessage 从队列取消息，收到 WM_QUIT 时返回 0 退出循环
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        TranslateMessage(&msg);   // 将按键消息转换为字符消息（WM_CHAR）
+        TranslateMessage(&msg); // 将按键消息转换为字符消息（WM_CHAR）
 
-        DispatchMessage(&msg);    // 把消息分发给对应窗口的窗口过程处理
+        DispatchMessage(&msg); // 把消息分发给对应窗口的窗口过程处理
     }
 
     // 退出循环时返回 WM_QUIT 消息携带的退出码（通常为 0）
@@ -59,6 +59,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 {
     switch (message)
     {
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        RECT rec = {20, 20, 60, 80};
+        HBRUSH brush = (HBRUSH)GetStockObject(BLACK_BRUSH);
+
+        FillRect(hdc, &rec, brush);
+
+        EndPaint(hWnd, &ps);
+    }
+    break;
+
     case WM_DESTROY: // 用户点击关闭按钮，窗口即将销毁时收到此消息
     {
         // 向消息队列投递 WM_QUIT，使上方 GetMessage 返回 0，结束消息循环
