@@ -92,13 +92,20 @@ int main(void)
         switch (pEvent->response_type & ~0x80)
         {
         case XCB_EXPOSE: /* 窗口内容暴露，需要重绘（本示例未绘制内容，故直接忽略） */
-            break;
+        {
+            xcb_rectangle_t rect = {20, 20, 60, 80};
+            xcb_poly_fill_rectangle(pConn, window, foreground, 1, &rect);
+            xcb_flush(pConn);
+        }
+        break;
         case XCB_KEY_PRESS: /* 任意按键：置退出标志，结束程序 */
             isQuit = 1;
             break;
         }
         free(pEvent); /* 每个事件由 xcb_wait_for_event 分配内存，使用后必须释放 */
     }
+
+    xcb_disconnect(pConn);
 
     return 0;
 }
