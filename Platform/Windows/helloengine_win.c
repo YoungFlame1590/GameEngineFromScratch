@@ -1,60 +1,60 @@
-#include <Windows.h>  // Win32 核心 API：窗口、消息、GDI 等
-#include <windowsx.h> // 常用的窗口消息处理辅助宏（如 GET_X_LPARAM 等）
-#include <tchar.h>    // TCHAR 宏：支持 ANSI/Unicode 的通用字符类型映射
+#include <Windows.h>  // Win32 core API: windows, messages, GDI, etc.
+#include <windowsx.h> // Helper macros for common window message handling (e.g. GET_X_LPARAM)
+#include <tchar.h>    // TCHAR macro: generic character type mapping for ANSI/Unicode
 
-// 窗口过程（回调函数）前向声明，WinMain 中将其注册给窗口类
+// Forward declaration of the window procedure (callback); registered to the window class in WinMain
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-// WinMain：Windows 图形界面程序的入口点
-// hInstance    当前程序实例的句柄
-// hPrevInstance 已废弃参数，始终为 NULL（16 位 Windows 遗留）
-// lpCmdLine    命令行参数字符串
-// nCmdShow     窗口初始显示方式（最大化/最小化/正常等）
+// WinMain: entry point of a Windows GUI program
+// hInstance     Handle to the current program instance
+// hPrevInstance Deprecated parameter, always NULL (legacy from 16-bit Windows)
+// lpCmdLine     Command-line argument string
+// nCmdShow      Initial window display mode (maximized/minimized/normal, etc.)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPTSTR lpCmdLine, int nCmdShow)
 {
-    HWND hWnd;     // 创建出的窗口句柄
-    WNDCLASSEX wc; // 窗口类结构体，描述窗口的行为与外观
+    HWND hWnd;     // Handle to the created window
+    WNDCLASSEX wc; // Window class structure describing the window's behavior and appearance
 
-    // 将窗口类结构体全部清零，避免残留垃圾数据
+    // Zero out the window class structure to avoid leftover garbage data
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
-    wc.cbSize = sizeof(WNDCLASSEX);           // 结构体大小，供系统校验版本
-    wc.style = CS_HREDRAW | CS_VREDRAW;       // 窗口尺寸变化时（水平/垂直）自动重绘
-    wc.lpfnWndProc = WindowProc;              // 指定该窗口类的消息处理函数
-    wc.hInstance = hInstance;                 // 关联当前程序实例
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // 使用系统默认箭头光标
-    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;  // 窗口背景用系统窗口色（白色）
-    wc.lpszClassName = _T("WindowClass1");    // 窗口类名称，创建窗口时按名引用
+    wc.cbSize = sizeof(WNDCLASSEX);           // Size of the structure, used by the system for version checking
+    wc.style = CS_HREDRAW | CS_VREDRAW;       // Repaint automatically when the window is resized (horizontally/vertically)
+    wc.lpfnWndProc = WindowProc;              // Message handler for this window class
+    wc.hInstance = hInstance;                 // Associate with the current program instance
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // Use the system default arrow cursor
+    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;  // Window background uses the system window color (white)
+    wc.lpszClassName = _T("WindowClass1");    // Window class name, referenced by name when creating windows
 
-    // 向系统注册窗口类，之后才能用 CreateWindowEx 创建实例
+    // Register the window class with the system before CreateWindowEx can create instances
     RegisterClassEx(&wc);
 
-    // 创建窗口实例：
-    // 样式 WS_OVERLAPPEDWINDOW 组合了标题栏、边框、系统菜单、最小化/最大化按钮
-    // 初始位置 (300, 300)，尺寸 500 x 400 像素
+    // Create a window instance:
+    // The WS_OVERLAPPEDWINDOW style combines the title bar, borders, system menu, and minimize/maximize buttons
+    // Initial position (300, 300), size 500 x 400 pixels
     hWnd = CreateWindowEx(0, _T("WindowClass1"), _T("Hello, Engine!"),
                           WS_OVERLAPPEDWINDOW,
                           300, 300, 500, 400, NULL, NULL, hInstance, NULL);
 
-    // 按 nCmdShow 指定的方式把窗口显示出来
+    // Display the window in the mode specified by nCmdShow
     ShowWindow(hWnd, nCmdShow);
 
-    MSG msg; // 消息结构体，存放从队列中取出的系统消息
+    MSG msg; // Message structure holding system messages retrieved from the queue
 
-    // 消息循环：GetMessage 从队列取消息，收到 WM_QUIT 时返回 0 退出循环
+    // Message loop: GetMessage retrieves a message from the queue; returns 0 on WM_QUIT to exit the loop
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        TranslateMessage(&msg); // 将按键消息转换为字符消息（WM_CHAR）
+        TranslateMessage(&msg); // Convert key messages into character messages (WM_CHAR)
 
-        DispatchMessage(&msg); // 把消息分发给对应窗口的窗口过程处理
+        DispatchMessage(&msg); // Dispatch the message to the window procedure of the corresponding window
     }
 
-    // 退出循环时返回 WM_QUIT 消息携带的退出码（通常为 0）
+    // When the loop exits, return the exit code carried by the WM_QUIT message (usually 0)
     return msg.wParam;
 }
 
-// 窗口过程：所有发送给该窗口的消息都会在这里被处理
+// Window procedure: all messages sent to this window are handled here
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -72,15 +72,15 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     }
     break;
 
-    case WM_DESTROY: // 用户点击关闭按钮，窗口即将销毁时收到此消息
+    case WM_DESTROY: // Received when the user clicks the close button and the window is about to be destroyed
     {
-        // 向消息队列投递 WM_QUIT，使上方 GetMessage 返回 0，结束消息循环
+        // Post WM_QUIT to the message queue so GetMessage above returns 0 and the message loop ends
         PostQuitMessage(0);
         return 0;
     }
     break;
     }
 
-    // 未处理的消息交给系统默认处理函数（处理最小化、绘制、调整大小等）
+    // Hand unhandled messages to the system default handler (handles minimize, painting, resizing, etc.)
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
