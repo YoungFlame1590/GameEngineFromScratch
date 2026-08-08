@@ -16,6 +16,8 @@ build/
 *.pdb
 *.lib
 *.dll
+*.vso
+*.pso
 
 # Linux build outputs
 /Platform/Linux/helloengine_xcb
